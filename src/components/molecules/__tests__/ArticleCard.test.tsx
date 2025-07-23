@@ -59,7 +59,7 @@ describe('ArticleCard', () => {
     
     render(<ArticleCard article={mockArticle} />);
     
-    const readMoreButton = screen.getByRole('button', { name: /read more/i });
+    const readMoreButton = screen.getByRole('button', { name: /continue reading/i });
     await user.click(readMoreButton);
     
     expect(windowOpenSpy).toHaveBeenCalledWith(

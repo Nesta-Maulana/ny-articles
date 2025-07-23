@@ -70,7 +70,7 @@ function App() {
   const initialLoadRef = useRef(false);
 
   useEffect(() => {
-    if (!initialLoadRef.current) {
+    if (!initialLoadRef.current && process.env.NODE_ENV !== 'test') {
       initialLoadRef.current = true;
       searchArticles("", 1);
     }

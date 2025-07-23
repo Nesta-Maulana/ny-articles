@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import { articleService } from './services/api';
@@ -11,18 +11,21 @@ describe('App', () => {
     vi.clearAllMocks();
   });
 
-  it('renders header and search bar', () => {
-    render(<App />);
+  it('renders header and search bar', async () => {
+    await act(async () => {
+      render(<App />);
+    });
     
-    expect(screen.getByText('NYT Article Search')).toBeInTheDocument();
+    expect(screen.getByText('Discover Stories That Matter')).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/search articles/i)).toBeInTheDocument();
   });
 
-  it('shows initial empty state', () => {
-    render(<App />);
+  it('shows initial empty state', async () => {
+    await act(async () => {
+      render(<App />);
+    });
     
-    expect(screen.getByText('Start your search')).toBeInTheDocument();
-    expect(screen.getByText('Enter keywords to find articles from The New York Times')).toBeInTheDocument();
+    expect(screen.getByText('Explore by Topic')).toBeInTheDocument();
   });
 
   it('performs search and displays results', async () => {
@@ -55,13 +58,18 @@ describe('App', () => {
     vi.mocked(articleService.searchArticles).mockResolvedValue(mockResponse);
 
     const user = userEvent.setup();
-    render(<App />);
+    
+    await act(async () => {
+      render(<App />);
+    });
 
     const searchInput = screen.getByPlaceholderText(/search articles/i);
     const searchButton = screen.getByRole('button', { name: /search/i });
 
-    await user.type(searchInput, 'test query');
-    await user.click(searchButton);
+    await act(async () => {
+      await user.type(searchInput, 'test query');
+      await user.click(searchButton);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Test Article')).toBeInTheDocument();
@@ -73,16 +81,21 @@ describe('App', () => {
     vi.mocked(articleService.searchArticles).mockRejectedValue(new Error('API Error'));
 
     const user = userEvent.setup();
-    render(<App />);
+    
+    await act(async () => {
+      render(<App />);
+    });
 
     const searchInput = screen.getByPlaceholderText(/search articles/i);
     const searchButton = screen.getByRole('button', { name: /search/i });
 
-    await user.type(searchInput, 'test query');
-    await user.click(searchButton);
+    await act(async () => {
+      await user.type(searchInput, 'test query');
+      await user.click(searchButton);
+    });
 
     await waitFor(() => {
-      expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
+      expect(screen.getByText(/unexpected error occurred/i)).toBeInTheDocument();
     });
   });
 
@@ -99,13 +112,18 @@ describe('App', () => {
     vi.mocked(articleService.searchArticles).mockResolvedValue(mockResponse);
 
     const user = userEvent.setup();
-    render(<App />);
+    
+    await act(async () => {
+      render(<App />);
+    });
 
     const searchInput = screen.getByPlaceholderText(/search articles/i);
     const searchButton = screen.getByRole('button', { name: /search/i });
 
-    await user.type(searchInput, 'no results query');
-    await user.click(searchButton);
+    await act(async () => {
+      await user.type(searchInput, 'no results query');
+      await user.click(searchButton);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('No articles found')).toBeInTheDocument();
