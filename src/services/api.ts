@@ -75,10 +75,16 @@ export const articleService = {
       const { q, page = 0, sort = 'relevance', beginDate, endDate } = params;
       
       const searchParams: Record<string, string | number> = {
-        q,
         page,
         sort,
       };
+      
+      if (q && q.trim()) {
+        searchParams.q = q;
+      } else {
+        searchParams.q = '*';
+        searchParams.sort = 'newest';
+      }
 
       if (beginDate) {
         searchParams.begin_date = beginDate;
@@ -89,6 +95,7 @@ export const articleService = {
       }
 
       console.log('Making API request with params:', searchParams);
+      console.log('Homepage request:', !q || !q.trim());
 
       const response = await api.get<NYTSearchResponse>('/articlesearch.json', {
         params: searchParams,

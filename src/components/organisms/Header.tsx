@@ -10,14 +10,12 @@ export const Header: React.FC = () => {
 
   return (
     <header className={styles.header}>
-      {/* Floating particles */}
       <div className={styles.particles}>
         {Array.from({ length: 9 }, (_, i) => (
           <div key={i} className={styles.particle} />
         ))}
       </div>
 
-      {/* Geometric shapes */}
       <div className={styles.shapes}>
         <div className={styles.shape} />
         <div className={styles.shape} />
@@ -48,10 +46,7 @@ export const Header: React.FC = () => {
         </a>
       </div>
 
-      {/* Scroll indicator */}
       <div className={styles.scrollIndicator}>
-        {/* <span className={styles.scrollText}>Scroll</span> */}
-        {/* <span className={styles.scrollArrow}>↓</span> */}
       </div>
     </header>
   );

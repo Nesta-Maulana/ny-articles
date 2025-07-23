@@ -80,7 +80,6 @@
   justify-content: center;
 }
 
-/* Animated mesh background */
 .header::before {
   content: '';
   position: absolute;
@@ -91,7 +90,6 @@
   z-index: 1;
 }
 
-/* Noise texture overlay */
 .header::after {
   content: '';
   position: absolute;
@@ -102,7 +100,6 @@
   z-index: 2;
 }
 
-/* Floating particles */
 .particles {
   position: absolute;
   inset: 0;
@@ -267,7 +264,6 @@
   transform: translateX(4px);
 }
 
-/* Scroll indicator */
 .scrollIndicator {
   position: absolute;
   bottom: var(--space-2xl);
@@ -294,7 +290,6 @@
   animation: float 2s ease-in-out infinite;
 }
 
-/* Geometric shapes */
 .shapes {
   position: absolute;
   inset: 0;
@@ -333,7 +328,6 @@
   animation-delay: 4s;
 }
 
-/* Mobile optimizations */
 @media (max-width: 768px) {
   .header {
     min-height: 100vh;

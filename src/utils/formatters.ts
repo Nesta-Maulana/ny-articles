@@ -18,7 +18,6 @@ export const getAuthorNames = (byline: { original: string }): string => {
 export const getThumbnailUrl = (multimedia?: { thumbnail?: { url: string }; default?: { url: string } }): string | null => {
   if (!multimedia) return null;
   
-  // Prefer thumbnail, fallback to default
   const imageUrl = multimedia.thumbnail?.url || multimedia.default?.url;
   
   if (imageUrl) {

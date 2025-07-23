@@ -73,7 +73,6 @@
   animation: shimmer 1s ease infinite;
 }
 
-/* Loading state */
 .searchBar.loading {
   opacity: 0.9;
 }
@@ -96,7 +95,6 @@
   align-items: center;
 }
 
-/* Typing indicator */
 .inputWrapper::after {
   content: '';
   position: absolute;
@@ -117,7 +115,7 @@
 .clearButton {
   position: absolute;
   right: 16px;
-  top: 50%;
+  top: 25%;
   transform: translateY(-50%);
   background: rgba(241, 245, 249, 0.8);
   border: none;
@@ -170,7 +168,6 @@
   transform: translateY(-50%) scale(0.95);
 }
 
-/* Search button loading animation */
 .searchBar button[disabled] {
   position: relative;
   overflow: hidden;

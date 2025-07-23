@@ -118,7 +118,6 @@
   color: var(--topic-color);
 }
 
-/* Mobile optimization */
 @media (max-width: 640px) {
   .container {
     margin: var(--space-2xl) 0;

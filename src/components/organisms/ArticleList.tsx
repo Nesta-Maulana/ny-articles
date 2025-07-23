@@ -11,6 +11,7 @@ interface ArticleListProps {
 }
 
 
+
 export const ArticleList: React.FC<ArticleListProps> = ({
   articles,
   isLoading,
@@ -23,10 +24,10 @@ export const ArticleList: React.FC<ArticleListProps> = ({
           <Spinner size="large" />
           <p className={styles.loadingText}>Discovering amazing stories...</p>
         </div>
-        <div className={styles.dynamicGrid}>
+        <div className={styles.articlesGrid}>
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className={styles.gridItem}>
-              <SkeletonCard variant="standard" />
+              <SkeletonCard />
             </div>
           ))}
         </div>
@@ -55,22 +56,22 @@ export const ArticleList: React.FC<ArticleListProps> = ({
   }
 
   return (
-    <div className={styles.dynamicGrid}>
-      {articles.map((article, index) => (
-        <div
-          key={article._id || `article-${index}`}
-          className={styles.gridItem}
-          style={{
-            animationDelay: `${Math.min(index * 0.1, 1)}s`
-          }}
-        >
-          <ArticleCard 
-            article={article} 
-            variant="standard"
-            size="medium"
-          />
-        </div>
-      ))}
+    <div className={styles.container}>
+      <div className={styles.articlesGrid}>
+        {articles.map((article, index) => (
+          <div
+            key={article._id || `article-${index}`}
+            className={styles.gridItem}
+            style={{
+              animationDelay: `${Math.min(index * 0.1, 1)}s`
+            }}
+          >
+            <ArticleCard 
+              article={article}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

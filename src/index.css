@@ -70,18 +70,15 @@ button {
   border-radius: 4px;
 }
 
-/* Scroll behavior */
 html {
   scroll-behavior: smooth;
 }
 
-/* Selection styling */
 ::selection {
   background: rgba(62, 146, 204, 0.2);
   color: var(--color-text-primary);
 }
 
-/* Improved scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -99,7 +96,6 @@ html {
   background: var(--color-accent);
 }
 
-/* Utility classes */
 .gradient-text {
   background: var(--gradient-accent);
   background-clip: text;

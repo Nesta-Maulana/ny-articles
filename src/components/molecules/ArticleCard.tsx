@@ -6,16 +6,11 @@ import styles from './ArticleCard.module.css';
 
 interface ArticleCardProps {
   article: NYTArticle;
-  variant?: 'standard' | 'featured' | 'compact';
-  size?: 'small' | 'medium' | 'large';
 }
 
 export const ArticleCard: React.FC<ArticleCardProps> = ({ 
-  article, 
-  variant = 'standard',
-  size = 'medium'
+  article
 }) => {
-  // Add validation for required fields
   if (!article || !article.headline?.main || !article.web_url) {
     console.warn('Invalid article data:', article);
     return null;
@@ -24,7 +19,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   const thumbnailUrl = getThumbnailUrl(article.multimedia);
   const authors = getAuthorNames(article.byline);
   const publicationDate = formatDate(article.pub_date);
-  const snippet = truncateText(article.snippet || article.abstract || '', variant === 'featured' ? 200 : 120);
+  const snippet = truncateText(article.snippet || article.abstract || '', 120);
   const categoryInfo = getCategoryInfo(article.section_name);
   const readingTime = getReadingTime(snippet);
   const isNew = isNewArticle(article.pub_date || '');
@@ -32,13 +27,30 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
   const handleReadMore = (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    const button = e.currentTarget as HTMLElement;
+    const ripple = document.createElement('div');
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+    
+    ripple.className = styles.ripple;
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    
+    button.appendChild(ripple);
+    
+    setTimeout(() => {
+      ripple.remove();
+    }, 600);
+    
     window.open(article.web_url, '_blank', 'noopener,noreferrer');
   };
 
   const cardClasses = [
     styles.card,
-    styles[variant],
-    styles[size],
     thumbnailUrl ? styles.hasImage : styles.noImage
   ].filter(Boolean).join(' ');
 
@@ -51,7 +63,6 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         '--category-rgb': categoryInfo.color.replace('var(--color-', '').replace(')', '')
       } as React.CSSProperties}
     >
-      {/* New Article Badge */}
       {isNew && (
         <div className={styles.newBadge}>
           <span className={styles.newIcon}>⚡</span>
@@ -59,13 +70,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         </div>
       )}
 
-      {/* Category Badge */}
       <div className={styles.categoryBadge}>
         <span className={styles.categoryIcon}>{categoryInfo.icon}</span>
         <span className={styles.categoryName}>{categoryInfo.name}</span>
       </div>
 
-      {/* Image Container with Overlay */}
       {thumbnailUrl && (
         <div className={styles.imageContainer}>
           <img
@@ -73,15 +82,23 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
             alt={article.headline.main}
             className={styles.image}
             loading="lazy"
+            onLoad={(e) => {
+              e.currentTarget.classList.add(styles.loaded);
+            }}
+            onError={(e) => {
+              const container = e.currentTarget.parentElement;
+              if (container) {
+                container.classList.add(styles.noImage);
+                e.currentTarget.style.display = 'none';
+              }
+            }}
           />
           <div className={styles.imageOverlay} />
           <div className={styles.imageGradient} />
         </div>
       )}
 
-      {/* Content */}
       <div className={styles.content}>
-        {/* Author Avatar & Meta */}
         <div className={styles.authorSection}>
           <div className={styles.authorAvatar}>
             {authorInitials}
@@ -96,17 +113,14 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           </div>
         </div>
 
-        {/* Title */}
         <h2 className={styles.title}>
           {article.headline.main}
         </h2>
 
-        {/* Snippet */}
         {snippet && (
           <p className={styles.snippet}>{snippet}</p>
         )}
 
-        {/* Engagement & Actions */}
         <div className={styles.footer}>
           <div className={styles.engagement}>
             <button className={styles.engagementBtn}>
@@ -117,20 +131,18 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               <span className={styles.commentIcon}>💬</span>
               <span>{Math.floor(Math.random() * 100) + 10}</span>
             </button>
-            <button className={styles.engagementBtn}>
-              <span className={styles.shareIcon}>🔗</span>
-              Share
+            <button className={styles.bookmarkBtn} title="Save article">
+              <span className={styles.bookmarkIcon}>🔖</span>
             </button>
           </div>
           
           <button className={styles.readMoreBtn}>
-            <span>Read Full Story</span>
+            <span>Continue Reading</span>
             <span className={styles.arrow}>→</span>
           </button>
         </div>
       </div>
 
-      {/* Hover Glow Effect */}
       <div className={styles.hoverGlow} />
     </article>
   );

@@ -1,15 +1,20 @@
-import { useState, useCallback, useEffect } from 'react';
-import { Header, ArticleList } from './components/organisms';
-import { SearchBar, ErrorMessage, Pagination, TrendingTopics } from './components/molecules';
-import type { NYTArticle } from './types';
-import { articleService, APIError } from './services/api';
-import { useDebounce } from './hooks/useDebounce';
-import './App.css';
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Header, ArticleList } from "./components/organisms";
+import {
+  SearchBar,
+  ErrorMessage,
+  Pagination,
+  TrendingTopics,
+} from "./components/molecules";
+import type { NYTArticle } from "./types";
+import { articleService, APIError } from "./services/api";
+import { useDebounce } from "./hooks/useDebounce";
+import "./App.css";
 
 const RESULTS_PER_PAGE = 10;
 
 function App() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [articles, setArticles] = useState<NYTArticle[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,13 +25,6 @@ function App() {
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   const searchArticles = useCallback(async (query: string, page: number) => {
-    if (!query.trim()) {
-      setArticles([]);
-      setTotalResults(0);
-      setHasSearched(false);
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
 
@@ -36,52 +34,57 @@ function App() {
         page: page - 1,
       });
 
-      // Validate response structure
-      if (!response || !response.response || !Array.isArray(response.response.docs)) {
-        throw new Error('Invalid API response structure');
+      if (
+        !response ||
+        !response.response ||
+        !Array.isArray(response.response.docs)
+      ) {
+        throw new Error("Invalid API response structure");
       }
-
-      console.log('Setting articles:', response.response.docs.length, 'articles');
-      console.log('First article:', response.response.docs[0]);
-
+      console.log("Search response:", response);
       setArticles(response.response.docs);
-      setTotalResults(response.response.meta?.hits || 0);
+      setTotalResults(response.response.docs.length || 0);
       setHasSearched(true);
     } catch (err) {
-      console.error('Search error in App component:', err);
+      console.error("Search error in App component:", err);
       setArticles([]);
       setTotalResults(0);
-      
+
       if (err instanceof APIError) {
-        console.error('APIError:', err.message, err.statusCode, err.originalError);
+        console.error(
+          "APIError:",
+          err.message,
+          err.statusCode,
+          err.originalError
+        );
         setError(err.message);
       } else {
-        console.error('Unknown error:', err);
-        setError('An unexpected error occurred. Please try again.');
+        console.error("Unknown error:", err);
+        setError("An unexpected error occurred. Please try again.");
       }
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Load homepage articles on initial mount
-  useEffect(() => {
-    // Only load homepage articles if no search has been performed yet
-    if (!hasSearched && !searchQuery && !debouncedSearchQuery) {
-      searchArticles('', 1); // Empty query for homepage
-    }
-  }, [hasSearched, searchQuery, debouncedSearchQuery, searchArticles]);
+  const initialLoadRef = useRef(false);
 
   useEffect(() => {
-    if (debouncedSearchQuery) {
+    if (!initialLoadRef.current) {
+      initialLoadRef.current = true;
+      searchArticles("", 1);
+    }
+  }, [searchArticles]);
+
+  useEffect(() => {
+    if (debouncedSearchQuery && debouncedSearchQuery.trim()) {
       searchArticles(debouncedSearchQuery, currentPage);
-    } else if (hasSearched) {
-      // Only clear if user has performed a search before
+    } else if (hasSearched && !debouncedSearchQuery) {
       setArticles([]);
       setTotalResults(0);
       setHasSearched(false);
     }
-  }, [debouncedSearchQuery, currentPage, searchArticles, hasSearched]);
+  }, [debouncedSearchQuery, currentPage, hasSearched, searchArticles]);
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
@@ -90,27 +93,29 @@ function App() {
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const handleRetry = useCallback(() => {
     searchArticles(searchQuery, currentPage);
   }, [searchQuery, currentPage, searchArticles]);
 
-  const handleTopicSearch = useCallback((topic: string) => {
-    handleSearch(topic);
-    // Scroll to results section
-    setTimeout(() => {
-      document.querySelector('.results-section')?.scrollIntoView({ 
-        behavior: 'smooth' 
-      });
-    }, 100);
-  }, [handleSearch]);
+  const handleTopicSearch = useCallback(
+    (topic: string) => {
+      handleSearch(topic);
+      setTimeout(() => {
+        document.querySelector(".results-section")?.scrollIntoView({
+          behavior: "smooth",
+        });
+      }, 100);
+    },
+    [handleSearch]
+  );
 
   return (
     <div className="app">
       <Header />
-      
+
       <main className="main-content">
         <section id="search-section" className="search-section">
           <SearchBar
@@ -120,7 +125,6 @@ function App() {
           />
         </section>
 
-        {/* Show trending topics on homepage */}
         {!searchQuery && !debouncedSearchQuery && !isLoading && (
           <TrendingTopics onTopicClick={handleTopicSearch} />
         )}
@@ -129,24 +133,26 @@ function App() {
           {!searchQuery && !debouncedSearchQuery && articles.length > 0 && (
             <div className="section-header">
               <h2 className="section-title">Latest Stories</h2>
-              <p className="section-subtitle">Stay informed with the most recent news and analysis</p>
-            </div>
-          )}
-          
-          {searchQuery && (
-            <div className="section-header">
-              <h2 className="section-title">Search Results</h2>
               <p className="section-subtitle">
-                Found {totalResults} articles for "{searchQuery}"
+                {totalResults > 0
+                  ? `${totalResults.toLocaleString()} latest articles available`
+                  : "Stay informed with the most recent news and analysis"}
               </p>
             </div>
           )}
-          
+
+          {searchQuery && debouncedSearchQuery && (
+            <div className="section-header">
+              <h2 className="section-title">Search Results</h2>
+              <p className="section-subtitle">
+                Found {totalResults.toLocaleString()} articles for "
+                {searchQuery}"
+              </p>
+            </div>
+          )}
+
           {error ? (
-            <ErrorMessage
-              message={error}
-              onRetry={handleRetry}
-            />
+            <ErrorMessage message={error} onRetry={handleRetry} />
           ) : (
             <>
               <ArticleList
@@ -154,7 +160,7 @@ function App() {
                 isLoading={isLoading}
                 hasSearched={hasSearched}
               />
-              
+
               {articles.length > 0 && (
                 <Pagination
                   currentPage={currentPage}
