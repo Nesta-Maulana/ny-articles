@@ -1,3 +1,20 @@
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes shine {
+  to {
+    left: 125%;
+  }
+}
+
 .button {
   font-family: inherit;
   border: 2px solid transparent;
@@ -13,49 +30,86 @@
   position: relative;
   overflow: hidden;
   letter-spacing: 0.025em;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 
 .button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
 }
 
+.button:active {
+  transform: translateY(-1px) scale(0.98);
+  transition: all 0.1s ease;
+}
+
+/* Ripple effect */
 .button::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: var(--ripple-y, 50%);
+  left: var(--ripple-x, 50%);
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-  transform: translate(-50%, -50%) scale(0);
-  transition: transform 0.3s ease;
   border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+  pointer-events: none;
+  opacity: 0.8;
 }
 
 .button:active::before {
   width: 300px;
   height: 300px;
-  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
 }
 
-.button:active {
-  transform: translateY(0);
+/* Shine effect */
+.button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.7s ease;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.button:hover::after {
+  animation: shine 0.7s ease;
+  opacity: 1;
 }
 
 .button:focus-visible {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4);
+  outline: none;
 }
 
 .primary {
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .primary:hover {
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.45);
+}
+
+.primary::before {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
 }
 
 .secondary {
@@ -69,23 +123,28 @@
   background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
   border-color: #cbd5e1;
   color: #334155;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
+.secondary::before {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+}
+
+/* Size variations with enhanced padding */
 .small {
-  padding: 8px 16px;
+  padding: 10px 18px;
   font-size: 14px;
   border-radius: 10px;
 }
 
 .medium {
-  padding: 14px 24px;
+  padding: 16px 28px;
   font-size: 16px;
   border-radius: 12px;
 }
 
 .large {
-  padding: 18px 32px;
+  padding: 20px 36px;
   font-size: 18px;
   border-radius: 14px;
 }
@@ -94,15 +153,58 @@
   width: 100%;
 }
 
+/* Loading state */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.button.loading {
+  color: transparent;
+  pointer-events: none;
+}
+
+.button.loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Disabled state */
 .button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
+  transform: none !important;
   filter: grayscale(0.3);
+  box-shadow: none !important;
 }
 
 .button:disabled:hover {
   transform: none;
   box-shadow: none;
   background: initial;
+}
+
+.button:disabled::before,
+.button:disabled::after {
+  display: none;
 }

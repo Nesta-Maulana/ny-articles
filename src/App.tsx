@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Header, ArticleList } from './components/organisms';
-import { SearchBar, ErrorMessage, Pagination } from './components/molecules';
+import { SearchBar, ErrorMessage, Pagination, TrendingTopics } from './components/molecules';
 import type { NYTArticle } from './types';
 import { articleService, APIError } from './services/api';
 import { useDebounce } from './hooks/useDebounce';
@@ -64,15 +64,24 @@ function App() {
     }
   }, []);
 
+  // Load homepage articles on initial mount
+  useEffect(() => {
+    // Only load homepage articles if no search has been performed yet
+    if (!hasSearched && !searchQuery && !debouncedSearchQuery) {
+      searchArticles('', 1); // Empty query for homepage
+    }
+  }, [hasSearched, searchQuery, debouncedSearchQuery, searchArticles]);
+
   useEffect(() => {
     if (debouncedSearchQuery) {
       searchArticles(debouncedSearchQuery, currentPage);
-    } else {
+    } else if (hasSearched) {
+      // Only clear if user has performed a search before
       setArticles([]);
       setTotalResults(0);
       setHasSearched(false);
     }
-  }, [debouncedSearchQuery, currentPage, searchArticles]);
+  }, [debouncedSearchQuery, currentPage, searchArticles, hasSearched]);
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
@@ -88,12 +97,22 @@ function App() {
     searchArticles(searchQuery, currentPage);
   }, [searchQuery, currentPage, searchArticles]);
 
+  const handleTopicSearch = useCallback((topic: string) => {
+    handleSearch(topic);
+    // Scroll to results section
+    setTimeout(() => {
+      document.querySelector('.results-section')?.scrollIntoView({ 
+        behavior: 'smooth' 
+      });
+    }, 100);
+  }, [handleSearch]);
+
   return (
     <div className="app">
       <Header />
       
       <main className="main-content">
-        <section className="search-section">
+        <section id="search-section" className="search-section">
           <SearchBar
             onSearch={handleSearch}
             isLoading={isLoading}
@@ -101,7 +120,28 @@ function App() {
           />
         </section>
 
+        {/* Show trending topics on homepage */}
+        {!searchQuery && !debouncedSearchQuery && !isLoading && (
+          <TrendingTopics onTopicClick={handleTopicSearch} />
+        )}
+
         <section className="results-section">
+          {!searchQuery && !debouncedSearchQuery && articles.length > 0 && (
+            <div className="section-header">
+              <h2 className="section-title">Latest Stories</h2>
+              <p className="section-subtitle">Stay informed with the most recent news and analysis</p>
+            </div>
+          )}
+          
+          {searchQuery && (
+            <div className="section-header">
+              <h2 className="section-title">Search Results</h2>
+              <p className="section-subtitle">
+                Found {totalResults} articles for "{searchQuery}"
+              </p>
+            </div>
+          )}
+          
           {error ? (
             <ErrorMessage
               message={error}

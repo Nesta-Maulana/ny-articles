@@ -1,0 +1,315 @@
+@keyframes searchGlow {
+  0%, 100% {
+    box-shadow: 0 8px 32px rgba(62, 146, 204, 0.1);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(62, 146, 204, 0.2);
+  }
+}
+
+@keyframes loadingPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.searchBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-sm);
+  gap: var(--space-md);
+  box-shadow: var(--shadow-xl);
+  transition: all var(--transition-base);
+  overflow: hidden;
+}
+
+.searchBar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.searchBar:focus-within::before {
+  transform: translateX(100%);
+}
+
+.searchBar:focus-within {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(62, 146, 204, 0.4);
+  animation: searchGlow 2s ease-in-out infinite;
+}
+
+.searchBar.loading {
+  pointer-events: none;
+  animation: loadingPulse 1.5s ease-in-out infinite;
+}
+
+.searchIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(62, 146, 204, 0.2);
+  border-radius: var(--radius-lg);
+  font-size: 1.2rem;
+  transition: all var(--transition-base);
+}
+
+.searchBar:focus-within .searchIcon {
+  background: rgba(62, 146, 204, 0.3);
+  transform: scale(1.05);
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: white;
+  padding: var(--space-lg) 0;
+  letter-spacing: 0.01em;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+}
+
+.input:focus::placeholder {
+  opacity: 0.4;
+}
+
+.clearButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.clearButton:hover {
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+  transform: scale(1.1);
+}
+
+.submitButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: var(--radius-lg);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 16px rgba(62, 146, 204, 0.3);
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(62, 146, 204, 0.4);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loadingSpinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Suggestions */
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-xl);
+  margin-top: var(--space-sm);
+  box-shadow: var(--shadow-2xl);
+  z-index: var(--z-dropdown);
+  animation: slideDown 0.3s ease-out;
+  overflow: hidden;
+}
+
+.suggestionsHeader {
+  padding: var(--space-md) var(--space-lg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  background: rgba(248, 250, 252, 0.8);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.3);
+}
+
+.suggestion:last-child {
+  border-bottom: none;
+}
+
+.suggestion:hover,
+.suggestion.selected {
+  background: rgba(62, 146, 204, 0.1);
+  transform: translateX(4px);
+}
+
+.suggestionIcon {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.suggestionText {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.trendingBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+  background: rgba(62, 146, 204, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .container {
+    max-width: none;
+    margin: 0 var(--space-lg);
+  }
+  
+  .searchBar {
+    padding: var(--space-xs);
+    gap: var(--space-sm);
+  }
+  
+  .searchIcon,
+  .submitButton {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .input {
+    font-size: 1rem;
+    padding: var(--space-md) 0;
+  }
+  
+  .clearButton {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+  
+  .suggestions {
+    margin: var(--space-sm) var(--space-lg) 0;
+    left: var(--space-lg);
+    right: var(--space-lg);
+  }
+  
+  .suggestion {
+    padding: var(--space-sm) var(--space-md);
+  }
+  
+  .suggestionText {
+    font-size: 0.9rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .suggestions {
+    background: rgba(30, 47, 71, 0.95);
+    border-color: rgba(71, 85, 105, 0.3);
+  }
+  
+  .suggestionsHeader {
+    background: rgba(15, 23, 42, 0.8);
+    color: var(--color-text-muted);
+  }
+  
+  .suggestionText {
+    color: white;
+  }
+  
+  .suggestion:hover,
+  .suggestion.selected {
+    background: rgba(62, 146, 204, 0.2);
+  }
+}

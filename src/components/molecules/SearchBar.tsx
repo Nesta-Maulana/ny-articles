@@ -31,7 +31,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   }, [onSearch]);
 
   return (
-    <form onSubmit={handleSubmit} className={styles.searchBar}>
+    <form onSubmit={handleSubmit} className={`${styles.searchBar} ${isLoading ? styles.loading : ''}`}>
       <div className={styles.inputWrapper}>
         <Input
           type="text"
@@ -39,7 +39,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
           fullWidth
+          seamless
           disabled={isLoading}
+          icon="🔍"
         />
         {query && (
           <button

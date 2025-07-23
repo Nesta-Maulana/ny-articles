@@ -10,6 +10,7 @@ interface ArticleListProps {
   hasSearched: boolean;
 }
 
+
 export const ArticleList: React.FC<ArticleListProps> = ({
   articles,
   isLoading,
@@ -20,11 +21,13 @@ export const ArticleList: React.FC<ArticleListProps> = ({
       <div className={styles.container}>
         <div className={styles.loadingHeader}>
           <Spinner size="large" />
-          <p className={styles.loadingText}>Searching articles...</p>
+          <p className={styles.loadingText}>Discovering amazing stories...</p>
         </div>
-        <div className={styles.grid}>
+        <div className={styles.dynamicGrid}>
           {Array.from({ length: 6 }).map((_, index) => (
-            <SkeletonCard key={index} />
+            <div key={index} className={styles.gridItem}>
+              <SkeletonCard variant="standard" />
+            </div>
           ))}
         </div>
       </div>
@@ -46,14 +49,27 @@ export const ArticleList: React.FC<ArticleListProps> = ({
       <EmptyState
         title="No articles found"
         message="Try searching with different keywords or adjust your search criteria"
+        icon="🔍"
       />
     );
   }
 
   return (
-    <div className={styles.grid}>
-      {articles.map((article) => (
-        <ArticleCard key={article._id} article={article} />
+    <div className={styles.dynamicGrid}>
+      {articles.map((article, index) => (
+        <div
+          key={article._id || `article-${index}`}
+          className={styles.gridItem}
+          style={{
+            animationDelay: `${Math.min(index * 0.1, 1)}s`
+          }}
+        >
+          <ArticleCard 
+            article={article} 
+            variant="standard"
+            size="medium"
+          />
+        </div>
       ))}
     </div>
   );
